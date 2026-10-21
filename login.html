@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Domótica · Entrar</title>
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<main class="login-wrap">
+  <form class="login-card" id="f" autocomplete="off" novalidate>
+    <h1>Domótica</h1>
+    <p class="sub">Entra con tu usuario y contraseña para controlar la casa.</p>
+    <label class="field"><span>Usuario</span>
+      <input id="u" name="usuario" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" required autofocus>
+    </label>
+    <label class="field"><span>Contraseña</span>
+      <input id="p" name="clave" type="password" autocomplete="new-password" required>
+    </label>
+    <div class="form-error" id="err" role="alert"></div>
+    <button class="btn-primary" id="go" type="submit">Entrar</button>
+  </form>
+</main>
+<script>
+const f = document.getElementById('f'), err = document.getElementById('err'), go = document.getElementById('go');
+// Si el navegador restaura esta página desde la caché, empezar en limpio
+window.addEventListener('pageshow', e => { if (e.persisted) { f.reset(); err.textContent = ''; } });
+f.addEventListener('submit', async ev => {
+  ev.preventDefault();
+  err.textContent = '';
+  const usuario = document.getElementById('u').value.trim(), clave = document.getElementById('p').value;
+  if (!usuario || !clave) { err.textContent = 'Escribe usuario y contraseña.'; return; }
+  go.disabled = true; go.textContent = 'Entrando…';
+  try {
+    const r = await fetch('/login', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+                                      body: JSON.stringify({ usuario, clave }), cache: 'no-store' });
+    const d = await r.json().catch(() => ({}));
+    if (r.ok) { location.replace('/'); return; }
+    err.textContent = d.error || 'No se pudo entrar. Inténtalo de nuevo.';
+  } catch (e) {
+    err.textContent = 'No hay conexión con el servidor.';
+  }
+  document.getElementById('p').value = '';
+  go.disabled = false; go.textContent = 'Entrar';
+});
+</script>
+</body>
+</html>

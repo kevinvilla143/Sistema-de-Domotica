@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Domótica</title>
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <h1>Domótica</h1>
+      <div class="conn"><span class="dot off" id="dot"></span><span id="connText">Conectando…</span></div>
+    </div>
+    <button class="btn-ghost" id="logout" type="button">Cerrar sesión</button>
+  </header>
+
+  <div class="banner" id="banner" role="status"></div>
+
+  <div class="layout">
+    <div class="col-main">
+      <section class="card" aria-labelledby="hLuces">
+        <h2 id="hLuces">Luces</h2>
+        <div class="lights">
+          <button class="light" id="luz1" type="button" role="switch" aria-checked="false" data-n="1">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1 2V16h5.2v-.2c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/></svg>
+            <span class="name">Luz 1</span><span class="state">Apagada</span>
+          </button>
+          <button class="light" id="luz2" type="button" role="switch" aria-checked="false" data-n="2">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1 2V16h5.2v-.2c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/></svg>
+            <span class="name">Luz 2</span><span class="state">Apagada</span>
+          </button>
+          <button class="light" id="luz3" type="button" role="switch" aria-checked="false" data-n="3">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1 2V16h5.2v-.2c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/></svg>
+            <span class="name">Luz 3</span><span class="state">Apagada</span>
+          </button>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="hClima">
+        <h2 id="hClima">Clima interior</h2>
+        <div class="grid2">
+          <div class="metric"><div class="label">Temperatura</div><div class="val num"><span id="temp">--</span><small>°C</small></div></div>
+          <div class="metric"><div class="label">Humedad</div><div class="val num"><span id="hum">--</span><small>%</small></div></div>
+        </div>
+        <div class="alerts" id="dhtWarn"></div>
+      </section>
+    </div>
+
+    <div class="col-side">
+      <section class="card" aria-labelledby="hEnergia">
+        <h2 id="hEnergia">Energía</h2>
+        <div class="battery">
+          <div class="row"><span class="pct num"><span id="bPct">--</span>%</span><span class="volts num">Batería · <span id="bV">--</span> V</span></div>
+          <div class="bar" role="progressbar" aria-label="Carga de la batería" aria-valuemin="0" aria-valuemax="100" id="bar"><i id="barFill"></i></div>
+        </div>
+        <div class="grid2">
+          <div class="metric"><div class="label">Panel solar</div><div class="val num"><span id="pV">--</span><small>V</small></div><div class="hint" id="pEstado">&nbsp;</div></div>
+          <div class="metric"><div class="label">Consumo</div><div class="val num"><span id="cW">--</span><small>W</small></div><div class="hint"><span id="cA" class="num">--</span> A</div></div>
+        </div>
+        <div class="alerts" id="acsWarn"></div>
+      </section>
+
+      <section class="card" aria-labelledby="hSistema">
+        <h2 id="hSistema">Sistema</h2>
+        <div class="actions">
+          <a class="btn-ghost" id="cfgLink" href="#" target="_blank" rel="noopener" style="text-decoration:none;color:inherit">Configurar WiFi</a>
+          <button class="btn-ghost" id="calib" type="button">Recalibrar corriente</button>
+          <button class="btn-ghost btn-danger" id="reset" type="button">Restablecer WiFi</button>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div class="footer num" id="footer">&nbsp;</div>
+</div>
+
+<dialog id="dlg">
+  <h3 id="dlgTitle"></h3>
+  <p id="dlgText"></p>
+  <div class="row">
+    <button class="btn-ghost" type="button" id="dlgNo">Cancelar</button>
+    <button class="btn-solid" type="button" id="dlgYes">Continuar</button>
+  </div>
+</dialog>
+<div class="toast" id="toast" role="status"></div>
+<script src="/static/app.js"></script>
+</body>
+</html>
