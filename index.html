@@ -1,91 +1,75 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="robots" content="noindex">
-<title>Domótica</title>
-<link rel="stylesheet" href="/static/app.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080d18">
+  <title>Domótica ESP32 · Panel de control</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2338bdf8'%3E%3Cpath d='M13 2 3 14h9l-1 8 10-12h-9z'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/css/styles.css">
+  <script src="/js/app.js" defer></script>
 </head>
 <body>
-<div class="app">
   <header class="topbar">
-    <div class="brand">
-      <h1>Domótica</h1>
-      <div class="conn"><span class="dot off" id="dot"></span><span id="connText">Conectando…</span></div>
-    </div>
-    <button class="btn-ghost" id="logout" type="button">Cerrar sesión</button>
+    <div class="brand-mark"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></svg></div>
+    <div class="brand-text"><p class="eyebrow">SUPERVISIÓN Y CONTROL</p><h1>DOMÓTICA <span>ESP32</span></h1><p class="subtitle">Energía · Tanque · Iluminación</p></div>
+    <div class="top-status"><span class="status-dot" id="statusDot"></span><span id="connection" class="status offline">Comprobando conexión…</span></div>
   </header>
+  <main>
+    <section class="metrics-grid">
+      <article class="metric-card"><div class="metric-top"><span class="metric-icon temp-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg></span><span class="metric-label">TEMPERATURA</span></div><div class="metric-value"><span id="temperature">--</span><small>°C</small></div><div class="metric-foot">Sensor DHT11</div></article>
+      <article class="metric-card"><div class="metric-top"><span class="metric-icon hum-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg></span><span class="metric-label">HUMEDAD</span></div><div class="metric-value"><span id="humidity">--</span><small>%</small></div><div class="metric-foot">Humedad ambiental</div></article>
+      <article class="metric-card"><div class="metric-top"><span class="metric-icon solar-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></span><span class="metric-label">PANEL SOLAR</span></div><div class="metric-value"><span id="solar">--</span><small>V</small></div><div class="metric-foot" id="solarState">Lectura de voltaje</div></article>
+      <article class="metric-card"><div class="metric-top"><span class="metric-icon battery-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="2" y="7" width="16" height="10" rx="2"/><path d="M22 11v2M6 11v2M10 11v2"/></svg></span><span class="metric-label">BATERÍA</span></div><div class="metric-value"><span id="battery">--</span><small>V</small></div><div class="metric-foot"><span id="batteryPercent">--</span> de carga estimada</div></article>
+    </section>
 
-  <div class="banner" id="banner" role="status"></div>
+    <section class="main-grid">
+      <div class="left-column">
+        <article class="panel tank-panel">
+          <div class="panel-heading"><div><p class="eyebrow">NIVEL DE AGUA</p><h2>Tanque de almacenamiento</h2></div><span id="tankBadge" class="mini-badge">ESPERANDO</span></div>
+          <div class="tank-layout">
+            <div class="tank-scale"><span>100%</span><span>75%</span><span>50%</span><span>25%</span><span>0%</span></div>
+            <div class="tank-shell"><div class="tank-water" id="water"></div><div class="tank-gloss"></div><div class="tank-center"><strong id="tankPercent">--%</strong><span>NIVEL</span></div></div>
+            <div class="tank-data">
+              <div class="data-line"><span>Nivel medido</span><strong id="level">--%</strong></div>
+              <div class="data-line"><span>Distancia al agua</span><strong><span id="distance">--</span> <small>cm</small></strong></div>
+              <div class="data-line"><span>Mini bomba · GPIO 25</span><strong id="pumpState" class="state-text">Sin datos</strong></div>
+              <div class="pump-note"><span class="pulse-dot"></span><span id="pumpMode">Automatización gestionada por el ESP32</span></div>
+            </div>
+          </div>
+        </article>
+        <article class="panel power-panel">
+          <div class="panel-heading"><div><p class="eyebrow">CONSUMO ELÉCTRICO</p><h2>Monitor de carga</h2></div><span class="panel-symbol"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></svg></span></div>
+          <div class="power-grid"><div class="power-cell"><span>Corriente</span><strong><span id="current">--</span><small> A</small></strong></div><div class="power-cell"><span>Potencia</span><strong><span id="power">--</span><small> W</small></strong></div><div class="power-cell"><span>Señal Wi-Fi</span><strong><span id="rssi">--</span><small> dBm</small></strong></div><div class="power-cell"><span>Tiempo activo</span><strong><span id="uptime">--</span></strong></div></div>
+        </article>
+      </div>
 
-  <div class="layout">
-    <div class="col-main">
-      <section class="card" aria-labelledby="hLuces">
-        <h2 id="hLuces">Luces</h2>
-        <div class="lights">
-          <button class="light" id="luz1" type="button" role="switch" aria-checked="false" data-n="1">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1 2V16h5.2v-.2c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/></svg>
-            <span class="name">Luz 1</span><span class="state">Apagada</span>
-          </button>
-          <button class="light" id="luz2" type="button" role="switch" aria-checked="false" data-n="2">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1 2V16h5.2v-.2c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/></svg>
-            <span class="name">Luz 2</span><span class="state">Apagada</span>
-          </button>
-          <button class="light" id="luz3" type="button" role="switch" aria-checked="false" data-n="3">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1 2V16h5.2v-.2c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/></svg>
-            <span class="name">Luz 3</span><span class="state">Apagada</span>
-          </button>
-        </div>
-      </section>
-
-      <section class="card" aria-labelledby="hClima">
-        <h2 id="hClima">Clima interior</h2>
-        <div class="grid2">
-          <div class="metric"><div class="label">Temperatura</div><div class="val num"><span id="temp">--</span><small>°C</small></div></div>
-          <div class="metric"><div class="label">Humedad</div><div class="val num"><span id="hum">--</span><small>%</small></div></div>
-        </div>
-        <div class="alerts" id="dhtWarn"></div>
-      </section>
-    </div>
-
-    <div class="col-side">
-      <section class="card" aria-labelledby="hEnergia">
-        <h2 id="hEnergia">Energía</h2>
-        <div class="battery">
-          <div class="row"><span class="pct num"><span id="bPct">--</span>%</span><span class="volts num">Batería · <span id="bV">--</span> V</span></div>
-          <div class="bar" role="progressbar" aria-label="Carga de la batería" aria-valuemin="0" aria-valuemax="100" id="bar"><i id="barFill"></i></div>
-        </div>
-        <div class="grid2">
-          <div class="metric"><div class="label">Panel solar</div><div class="val num"><span id="pV">--</span><small>V</small></div><div class="hint" id="pEstado">&nbsp;</div></div>
-          <div class="metric"><div class="label">Consumo</div><div class="val num"><span id="cW">--</span><small>W</small></div><div class="hint"><span id="cA" class="num">--</span> A</div></div>
-        </div>
-        <div class="alerts" id="acsWarn"></div>
-      </section>
-
-      <section class="card" aria-labelledby="hSistema">
-        <h2 id="hSistema">Sistema</h2>
-        <div class="actions">
-          <a class="btn-ghost" id="cfgLink" href="#" target="_blank" rel="noopener" style="text-decoration:none;color:inherit">Configurar WiFi</a>
-          <button class="btn-ghost" id="calib" type="button">Recalibrar corriente</button>
-          <button class="btn-ghost btn-danger" id="reset" type="button">Restablecer WiFi</button>
-        </div>
-      </section>
-    </div>
-  </div>
-
-  <div class="footer num" id="footer">&nbsp;</div>
-</div>
-
-<dialog id="dlg">
-  <h3 id="dlgTitle"></h3>
-  <p id="dlgText"></p>
-  <div class="row">
-    <button class="btn-ghost" type="button" id="dlgNo">Cancelar</button>
-    <button class="btn-solid" type="button" id="dlgYes">Continuar</button>
-  </div>
-</dialog>
-<div class="toast" id="toast" role="status"></div>
-<script src="/static/app.js"></script>
+      <div class="right-column">
+        <article class="panel lighting-panel">
+          <div class="panel-heading"><div><p class="eyebrow">SALIDAS DIGITALES</p><h2>Control de iluminación</h2></div><span class="panel-symbol bulb-symbol"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5a6 6 0 0 0-12 0c0 1 .5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6M10 22h4"/></svg></span></div>
+          <p class="panel-description">Pulsa una tarjeta para cambiar el estado de cada luz.</p>
+          <div id="loginFormWrap" class="login-wrap">
+            <form id="loginForm">
+              <label for="usuario">Usuario administrador</label><input id="usuario" name="usuario" type="text" autocomplete="username" placeholder="Usuario" required>
+              <label for="clave">Contraseña</label><div class="pass-field"><input id="clave" name="clave" type="password" autocomplete="current-password" placeholder="Contraseña" required><button type="button" class="pass-toggle" id="togglePassword" aria-label="Mostrar contraseña" aria-controls="clave" aria-pressed="false" title="Mostrar contraseña"><svg class="icon eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><svg class="icon eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 19c-6.5 0-10-7-10-7a18.5 18.5 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c6.5 0 10 7 10 7a18.5 18.5 0 0 1-2.16 3.19M14.12 14.12a3 3 0 1 1-4.24-4.24M1 1l22 22"/></svg></button></div>
+              <button type="submit" class="primary-btn" id="loginButton">Iniciar sesión</button>
+              <p id="loginMessage" class="message" role="status"></p>
+            </form>
+          </div>
+          <div id="lightControls" hidden>
+            <div class="lights-grid">
+              <button type="button" class="light-tile" data-light="1" aria-pressed="false"><span class="bulb"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5a6 6 0 0 0-12 0c0 1 .5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6M10 22h4"/></svg></span><span class="light-name">LUZ 1</span><span class="light-state" id="luz1">Sin datos</span><span class="light-action">PULSAR PARA CAMBIAR</span></button>
+              <button type="button" class="light-tile" data-light="2" aria-pressed="false"><span class="bulb"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5a6 6 0 0 0-12 0c0 1 .5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6M10 22h4"/></svg></span><span class="light-name">LUZ 2</span><span class="light-state" id="luz2">Sin datos</span><span class="light-action">PULSAR PARA CAMBIAR</span></button>
+              <button type="button" class="light-tile" data-light="3" aria-pressed="false"><span class="bulb"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5a6 6 0 0 0-12 0c0 1 .5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6M10 22h4"/></svg></span><span class="light-name">LUZ 3</span><span class="light-state" id="luz3">Sin datos</span><span class="light-action">PULSAR PARA CAMBIAR</span></button>
+            </div>
+            <p id="lightMessage" class="message" role="status"></p>
+            <button type="button" id="logoutButton" class="secondary-btn">Cerrar sesión</button>
+          </div>
+        </article>
+        <article class="panel connection-panel"><div class="panel-heading"><div><p class="eyebrow">ESTADO DEL SISTEMA</p><h2>Diagnóstico</h2></div><span class="panel-symbol"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span></div><div class="diagnostic-row"><span class="diag-led" id="diagLed"></span><span id="diagText">Esperando datos del ESP32</span></div><div class="diagnostic-foot" id="updated">Iniciando supervisión…</div><div class="diagnostic-foot">Actualización automática sin recargar la página.</div></article>
+      </div>
+    </section>
+    <footer>DOMÓTICA ESP32 <span>•</span> PANEL LOCAL DE SUPERVISIÓN</footer>
+  </main>
 </body>
 </html>

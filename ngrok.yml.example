@@ -1,0 +1,14 @@
+# Ejemplo de configuración manual de ngrok (formato v3) para Domotica ESP32.
+# install-ngrok.sh ya genera algo equivalente en /etc/ngrok/ngrok.yml.
+#
+#   ngrok config check --config ngrok.yml
+#   ngrok start --all --config ngrok.yml          # prueba en primer plano
+#   sudo ngrok service install --config /etc/ngrok/ngrok.yml && sudo ngrok service start
+version: 3
+agent:
+  authtoken: PON_AQUI_TU_AUTHTOKEN
+endpoints:
+  - name: domotica
+    url: https://tu-dominio.ngrok-free.app   # opcional; si lo quitas, ngrok asigna uno aleatorio
+    upstream:
+      url: 5036                              # puerto donde escucha Domotica ESP32

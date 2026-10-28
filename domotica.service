@@ -1,0 +1,33 @@
+[Unit]
+Description=Domotica ESP32 - servidor web (ASP.NET Core)
+Documentation=file:///opt/domotica
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=domotica
+Group=domotica
+WorkingDirectory=/opt/domotica
+EnvironmentFile=/etc/domotica/domotica.env
+ExecStart=@DOTNET@ /opt/domotica/DomoticaESP32.Server.dll
+Restart=always
+RestartSec=5
+SyslogIdentifier=domotica
+KillSignal=SIGINT
+TimeoutStopSec=20
+
+# Endurecimiento básico
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+
+[Install]
+WantedBy=multi-user.target

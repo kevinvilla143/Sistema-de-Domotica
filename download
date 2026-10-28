@@ -1,0 +1,4 @@
+# Los scripts de Linux DEBEN tener finales de línea LF (con CRLF de Windows fallan en Ubuntu).
+*.sh text eol=lf
+*.service text eol=lf
+*.py text eol=lf

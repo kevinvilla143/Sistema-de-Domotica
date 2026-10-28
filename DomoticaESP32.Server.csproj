@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <!-- Ubuntu Server minimal normalmente NO trae libicu: sin esto la app puede
+         fallar al arrancar con "Couldn't find a valid ICU package". -->
+    <InvariantGlobalization>true</InvariantGlobalization>
+
+    <!-- Servidor pequeño (mini-PC / VM / Raspberry): GC de estación de trabajo, menos RAM. -->
+    <ServerGarbageCollector>false</ServerGarbageCollector>
+    <ConcurrentGarbageCollection>false</ConcurrentGarbageCollection>
+  </PropertyGroup>
+
+</Project>
